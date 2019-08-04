@@ -1,11 +1,13 @@
 package example.com;
 
+import java.io.Serializable;
+
 /**
  * Created by KihiuFrank
  * Copyright © 2019
  * franklinekihiu@gmail.com
  */
-public class TravelDeal {
+public class TravelDeal implements Serializable {
     private String id;
     private String title;
     private String description;
