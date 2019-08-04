@@ -63,6 +63,25 @@ public class DealActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.save_menu, menu);
+        if (FirebaseUtil.isAdmin) {
+            menu.findItem(R.id.delete_menu).setVisible(true);
+            menu.findItem(R.id.save_menu).setVisible(true);
+            enableEditTexts(true);
+        }
+        else {
+            menu.findItem(R.id.delete_menu).setVisible(false);
+            menu.findItem(R.id.save_menu).setVisible(false);
+            enableEditTexts(false);
+        }
+
+
+        return true;
+    }
+
     private void clean() {
         textTitle.setText("");
         textPrice.setText("");
@@ -82,6 +101,11 @@ public class DealActivity extends AppCompatActivity {
         databaseReference.push().setValue(deal);
     }
 
+    private void enableEditTexts(boolean isEnabled) {
+        textTitle.setEnabled(isEnabled);
+        textDescription.setEnabled(isEnabled);
+        textPrice.setEnabled(isEnabled);
+    }
     private void deleteDeal() {
         if (deal==null) {
             Toast.makeText(this, "Error deleting deal\n You must save the deal before deleting it!", Toast.LENGTH_LONG).show();
@@ -95,11 +119,4 @@ public class DealActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.save_menu, menu);
-        return true;
-    }
 }
