@@ -33,6 +33,7 @@ public class DealActivity extends AppCompatActivity {
     EditText textTitle, textDescription, textPrice;
     TravelDeal deal;
     ImageView imageView;
+    private Button btnImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +58,7 @@ public class DealActivity extends AppCompatActivity {
         textDescription.setText(deal.getDescription());
         textPrice.setText(deal.getPrice());
         showImage(deal.getImageUrl());
-        Button btnImage = findViewById(R.id.btnImage);
+        btnImage = findViewById(R.id.btnImage);
 
         btnImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,19 +116,21 @@ public class DealActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICTURE_RESULT && requestCode == RESULT_OK) {
-            final Uri imageUri = data.getData();
-            StorageReference reference = FirebaseUtil.storageReference.child(imageUri.getLastPathSegment());
-            reference.putFile(imageUri).addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
+        if (requestCode == PICTURE_RESULT && resultCode == RESULT_OK) {
+            Uri imageUri = data.getData();
+            final StorageReference ref = FirebaseUtil.storageReference.child(imageUri.getLastPathSegment());
+            ref.putFile(imageUri).addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    String url =  taskSnapshot.getDownloadUrl().toString();
                     String pictureName = taskSnapshot.getStorage().getPath();
-                    deal.setImageUrl(url);
                     deal.setImageName(pictureName);
-                    Log.d("Url", url);
-                    Log.d("ImageName", pictureName);
-                    showImage(url);
+                    ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            deal.setImageUrl(uri.toString());
+                            showImage(uri.toString());
+                        }
+                    });
                 }
             });
         }
